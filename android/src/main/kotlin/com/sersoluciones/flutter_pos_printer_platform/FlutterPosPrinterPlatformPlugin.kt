@@ -397,6 +397,7 @@ class FlutterPosPrinterPlatformPlugin : FlutterPlugin, MethodCallHandler, Plugin
     return true
 }
 
+
     private fun hasPermissions(context: Context?, vararg permissions: String?): Boolean {
         if (context != null) {
             for (permission in permissions) {
@@ -409,29 +410,33 @@ class FlutterPosPrinterPlatformPlugin : FlutterPlugin, MethodCallHandler, Plugin
     }
 
 
-    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-        currentActivity = binding.activity
-        binding.addRequestPermissionsResultListener(this)
-        binding.addActivityResultListener(this)
-        bluetoothService.setActivity(currentActivity)
-    }
+   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+    currentActivity = binding.activity
+    Log.d(TAG, "Activity attached: $currentActivity")
+    binding.addRequestPermissionsResultListener(this)
+    binding.addActivityResultListener(this)
+    bluetoothService.setActivity(currentActivity)
+}
 
-    override fun onDetachedFromActivityForConfigChanges() {
-        currentActivity = null
-        bluetoothService.setActivity(null)
-    }
+override fun onDetachedFromActivityForConfigChanges() {
+    Log.d(TAG, "Activity detached for config changes")
+    currentActivity = null
+    bluetoothService.setActivity(null)
+}
 
-    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-        currentActivity = binding.activity
-        binding.addRequestPermissionsResultListener(this)
-        binding.addActivityResultListener(this)
-        bluetoothService.setActivity(currentActivity)
-    }
+override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+    currentActivity = binding.activity
+    Log.d(TAG, "Activity reattached for config changes: $currentActivity")
+    binding.addRequestPermissionsResultListener(this)
+    binding.addActivityResultListener(this)
+    bluetoothService.setActivity(currentActivity)
+}
 
-    override fun onDetachedFromActivity() {
-        currentActivity = null
-        bluetoothService.setActivity(null)
-    }
+override fun onDetachedFromActivity() {
+    Log.d(TAG, "Activity detached")
+    currentActivity = null
+    bluetoothService.setActivity(null)
+}
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         when (requestCode) {
