@@ -31,6 +31,12 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry
 
+
+interface PermissionCallback {
+    fun onPermissionResult(granted: Boolean)
+}
+
+
 /** FlutterPosPrinterPlatformPlugin */
 class FlutterPosPrinterPlatformPlugin : FlutterPlugin, MethodCallHandler, PluginRegistry.RequestPermissionsResultListener,
     PluginRegistry.ActivityResultListener,
@@ -169,12 +175,12 @@ class FlutterPosPrinterPlatformPlugin : FlutterPlugin, MethodCallHandler, Plugin
     }
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+    try {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, methodChannel)
         channel.setMethodCallHandler(this)
 
         messageChannel = EventChannel(flutterPluginBinding.binaryMessenger, eventChannelBT)
         messageChannel?.setStreamHandler(object : EventChannel.StreamHandler {
-
             override fun onListen(p0: Any?, sink: EventChannel.EventSink) {
                 eventSink = sink
             }
@@ -186,7 +192,6 @@ class FlutterPosPrinterPlatformPlugin : FlutterPlugin, MethodCallHandler, Plugin
 
         messageUSBChannel = EventChannel(flutterPluginBinding.binaryMessenger, eventChannelUSB)
         messageUSBChannel?.setStreamHandler(object : EventChannel.StreamHandler {
-
             override fun onListen(p0: Any?, sink: EventChannel.EventSink) {
                 eventUSBSink = sink
             }
@@ -201,7 +206,14 @@ class FlutterPosPrinterPlatformPlugin : FlutterPlugin, MethodCallHandler, Plugin
         adapter.init(context)
 
         bluetoothService = BluetoothService.getInstance(bluetoothHandler)
+        isBluetoothServiceInitialized = true
+
+        Log.d(TAG, "onAttachedToEngine: Sve komponente uspješno inicijalizirane")
+    } catch (e: Exception) {
+        Log.e(TAG, "onAttachedToEngine: Greška prilikom inicijalizacije", e)
+        isBluetoothServiceInitialized = false
     }
+}
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         isScan = false
